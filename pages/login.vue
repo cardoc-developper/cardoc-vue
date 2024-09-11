@@ -17,7 +17,6 @@ const router = useRouter();
 const isRegistering = ref(false);
 
 const login = async () => {
-  console.log("la");
   try {
     const userCredential = await signInWithEmailAndPassword(
       $auth,
