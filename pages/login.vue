@@ -1,18 +1,23 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
 import { useRouter } from "vue-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { useNuxtApp } from "#app";
+import { collection, addDoc } from "firebase/firestore";
 
-const { $auth } = useNuxtApp();
+const { $auth, $db } = useNuxtApp();
 
 const email = ref("");
 const password = ref("");
+const confirmPassword = ref("");
 const errorMessage = ref("");
 const router = useRouter();
+const isRegistering = ref(false);
 
-const login = async (event) => {
-  event.preventDefault();
+const login = async () => {
+  console.log("la");
   try {
     const userCredential = await signInWithEmailAndPassword(
       $auth,
@@ -21,10 +26,53 @@ const login = async (event) => {
     );
     console.log("Utilisateur connecté:", userCredential.user);
     router.push("/dashboard");
-  } catch (error) {
+  } catch (error: any) {
     errorMessage.value = error.message;
     console.error("Erreur lors de la connexion:", error);
   }
+};
+
+const register = async () => {
+  if (password.value !== confirmPassword.value) {
+    errorMessage.value = "Passwords do not match!";
+    return;
+  }
+  try {
+    // Create fb user
+    const userCredential = await createUserWithEmailAndPassword(
+      $auth,
+      email.value,
+      password.value
+    );
+    const user = userCredential.user;
+
+    // Create db user
+    await addDoc(collection($db, "users"), {
+      id: user.uid,
+      email: user.email,
+      created_at: new Date(),
+    });
+
+    console.log("Utilisateur enregistré:", user);
+    router.push("/dashboard");
+  } catch (error: any) {
+    errorMessage.value = error.message;
+    console.error("Erreur lors de l'inscription:", error);
+  }
+};
+
+const handleSubmitForm = () => {
+  if (isRegistering.value) {
+    register();
+  } else {
+    login();
+  }
+};
+
+const toggleForm = () => {
+  isRegistering.value = !isRegistering.value;
+  errorMessage.value = "";
+  confirmPassword.value = "";
 };
 </script>
 
@@ -39,18 +87,19 @@ const login = async (event) => {
       <h2
         class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
       >
-        Sign in to your account
+        {{ isRegistering ? "Create a new account" : "Sign in to your account" }}
       </h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form class="space-y-6" @submit="login">
+      <div class="space-y-6">
         <div>
           <label
             for="email"
             class="block text-sm font-medium leading-6 text-gray-900"
-            >Email address</label
           >
+            Email address
+          </label>
           <div class="mt-2">
             <input
               v-model="email"
@@ -65,20 +114,12 @@ const login = async (event) => {
         </div>
 
         <div>
-          <div class="flex items-center justify-between">
-            <label
-              for="password"
-              class="block text-sm font-medium leading-6 text-gray-900"
-              >Password</label
-            >
-            <div class="text-sm">
-              <a
-                href="#"
-                class="font-semibold text-indigo-600 hover:text-indigo-500"
-                >Forgot password?</a
-              >
-            </div>
-          </div>
+          <label
+            for="password"
+            class="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Password
+          </label>
           <div class="mt-2">
             <input
               v-model="password"
@@ -92,27 +133,48 @@ const login = async (event) => {
           </div>
         </div>
 
+        <div v-if="isRegistering">
+          <label
+            for="confirm-password"
+            class="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Confirm Password
+          </label>
+          <div class="mt-2">
+            <input
+              v-model="confirmPassword"
+              id="confirm-password"
+              name="confirm-password"
+              type="password"
+              required
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+
         <div>
           <button
-            type="submit"
+            @click="handleSubmitForm"
             class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Sign in
+            {{ isRegistering ? "Sign up" : "Sign in" }}
           </button>
         </div>
-      </form>
+      </div>
 
       <p v-if="errorMessage" class="mt-4 text-center text-sm text-red-500">
         {{ errorMessage }}
       </p>
 
       <p class="mt-10 text-center text-sm text-gray-500">
-        Not a member?
+        {{ isRegistering ? "Already have an account?" : "Not a member?" }}
         <a
           href="#"
+          @click.prevent="toggleForm"
           class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-          >Start a 14 day free trial</a
         >
+          {{ isRegistering ? "Sign in" : "Register" }}
+        </a>
       </p>
     </div>
   </div>
