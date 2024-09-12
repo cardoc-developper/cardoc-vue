@@ -25,14 +25,11 @@ const colors = ref([
 ]);
 
 const energies = ref(['Essence', 'Diesel', 'Hybride', 'Electrique', 'GPL', 'Autre']);
-
-const owners = ref([1, 2, 3, 'Autres']);
 </script>
 
 
 <template>
     <div class="mb-6">
-      <!-- Sélection de la couleur -->
       <label class="block text-gray-700 mb-2">Couleur du véhicule</label>
       <div class="flex space-x-2">
         <button
@@ -46,7 +43,6 @@ const owners = ref([1, 2, 3, 'Autres']);
       </div>
     </div>
   
-    <!-- Kilométrage du véhicule -->
     <div class="mb-6">
       <label for="mileage" class="block text-gray-700 mb-2">Kilométrage du véhicule</label>
       <input
@@ -58,7 +54,6 @@ const owners = ref([1, 2, 3, 'Autres']);
       />
     </div>
   
-    <!-- Sélection de l'énergie -->
     <div class="mb-6">
       <label class="block text-gray-700 mb-2">Energie du véhicule</label>
       <div class="grid grid-cols-3 gap-2">
@@ -76,12 +71,11 @@ const owners = ref([1, 2, 3, 'Autres']);
   
     
   
-    <!-- Nombre de propriétaires -->
     <div class="mb-6">
       <label class="block text-gray-700 mb-2">Nombre de propriétaire(s) du véhicule</label>
       <div class="grid gap-2">
         <input
-            v-model="vehicle.numberOfOwner"
+            v-model="vehicle.numberOfOwners"
             type="number"
             id="owner"
             class="w-full p-2 border border-gray-300 rounded-lg"
@@ -90,7 +84,6 @@ const owners = ref([1, 2, 3, 'Autres']);
       </div>
     </div>
   
-    <!-- Boutons de navigation -->
     <div class="flex justify-between gap-4">
       <button
         @click="onPreviousStep"

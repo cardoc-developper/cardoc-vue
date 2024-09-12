@@ -12,16 +12,17 @@ const vehicle = ref<Vehicle>({
   type: '',
   brand: '',
   model: '',
-  mileage: 0,
+  mileage: parseInt('0'),
   color: '',
   energy: '',
   dateOfFirstRegistration: '',
   dateOfPurchase: '',
-  numberOfOwner: '',
+  numberOfOwners: '',
+  images: [],
 });
 
 const currentStep = ref(1);
-const totalSteps = ref(3);
+const totalSteps = ref(5);
 
 const nextStep = () => {
   if (currentStep.value < totalSteps.value) {
@@ -52,6 +53,14 @@ const previousStep = () => {
 
       <div v-if="currentStep === 3">
         <AddFormStepThree v-model:vehicle="vehicle" @next-step="nextStep" @previous-step="previousStep"/>
+      </div>
+
+      <div v-if="currentStep === 4">
+        <AddFormStepFour v-model:vehicle="vehicle" @next-step="nextStep" @previous-step="previousStep"/>
+      </div>
+
+      <div v-if="currentStep === 5">
+        <AddFormStepFive v-model:vehicle="vehicle" @previous-step="previousStep"/>
       </div>
     </div> 
   </div>

@@ -1,0 +1,102 @@
+{
+    "Yamaha": [
+      "YZF-R1",
+      "YZF-R6",
+      "MT-07",
+      "MT-09",
+      "FJR1300",
+      "Ténéré 700",
+      "XSR900"
+    ],
+    "Suzuki": [
+      "GSX-R1000",
+      "GSX-R750",
+      "V-Strom 650",
+      "Hayabusa",
+      "SV650",
+      "Boulevard M109R"
+    ],
+    "Kawasaki": [
+      "Ninja H2",
+      "Ninja ZX-10R",
+      "Z900",
+      "Versys 650",
+      "Vulcan S",
+      "Z1000"
+    ],
+    "Honda": [
+      "CBR1000RR",
+      "CBR600RR",
+      "Africa Twin",
+      "Gold Wing",
+      "CB650R",
+      "Rebel 500"
+    ],
+    "Ducati": [
+      "Panigale V4",
+      "Monster 821",
+      "Multistrada 950",
+      "Diavel 1260",
+      "Scrambler Icon",
+      "Hypermotard 950"
+    ],
+    "Aprilia": [
+      "RSV4",
+      "Tuono V4",
+      "Shiver 900",
+      "Dorsoduro 900",
+      "RS 660"
+    ],
+    "Triumph": [
+      "Street Triple",
+      "Bonneville T120",
+      "Tiger 900",
+      "Speed Triple",
+      "Rocket 3"
+    ],
+    "MV Agusta": [
+      "Brutale 800",
+      "F3 675",
+      "Dragster 800"
+    ],
+    "KTM": [
+      "1290 Super Duke R",
+      "790 Duke",
+      "390 Duke",
+      "1290 Super Adventure",
+      "690 Enduro R"
+    ],
+    "Harley Davidson": [
+      "Iron 883",
+      "Street Glide",
+      "Fat Boy",
+      "Road King",
+      "Sportster S"
+    ],
+    "Buell": [
+      "1125R",
+      "XB12R Firebolt",
+      "XB9SX CityX"
+    ],
+    "Moto Guzzi": [
+      "V7 III",
+      "California Touring",
+      "MGX-21"
+    ],
+    "Victory": [
+      "Cross Country",
+      "Magnum",
+      "Octane"
+    ],
+    "Indian": [
+      "Scout",
+      "Chief Vintage",
+      "Chieftain"
+    ],
+    "Zero": [
+      "SR/F",
+      "FX",
+      "DSR"
+    ],
+    "Autre": ["Autre modèle"]
+  }
