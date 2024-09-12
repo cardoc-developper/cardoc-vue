@@ -70,7 +70,7 @@ const removeImage = (index: number) => {
         @click="console.log(vehicle)"
         class="w-full bg-vibrant-red text-white py-2 px-4 rounded-lg hover:bg-burnt-red"
       >
-        Suivant
+        Ajouter le véhicule
       </button>
     </div>
   </template>

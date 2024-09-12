@@ -31,7 +31,7 @@ const goTo = (path: string) => {
         </p>
       </div>
 
-      <Button text="Ajouter un véhicule" @click="goTo('vehicle/create')" />
+      <Button text="Ajouter un véhicule" @click="goTo('vehicle/add')" />
     </div>
     <div class="col-span-2 h-full my-2 text-2xl text-gray-800 font-medium p-4">
       Raccourcis
