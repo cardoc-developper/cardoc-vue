@@ -6,7 +6,7 @@ import AddFormStepThree from '../../components/AddFormStepThree.vue';
 import type { Vehicle } from '../../types/vehicle';
 
 const vehicle = ref<Vehicle>({
-  vehicleId: '',
+  id: '',
   licensePlate: '',
   vehicleName: '',
   type: '',
