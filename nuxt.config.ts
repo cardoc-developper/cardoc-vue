@@ -12,4 +12,5 @@ export default defineNuxtConfig({
 
   plugins: ["~/plugins/axios", "~/plugins/firebase"],
   compatibilityDate: "2024-09-10",
+  modules: ["shadcn-nuxt"],
 });
