@@ -5,12 +5,14 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { useNuxtApp } from "#app";
-import { collection, addDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 
 const { $auth, $db } = useNuxtApp();
 
 const email = ref("");
 const password = ref("");
+const firstName = ref("");
+const lastName = ref("");
 const confirmPassword = ref("");
 const errorMessage = ref("");
 const router = useRouter();
@@ -23,8 +25,7 @@ const login = async () => {
       email.value,
       password.value
     );
-    console.log("Utilisateur connecté:", userCredential.user);
-    router.push("/dashboard");
+    router.push("/");
   } catch (error: any) {
     errorMessage.value = error.message;
     console.error("Erreur lors de la connexion:", error);
@@ -46,14 +47,14 @@ const register = async () => {
     const user = userCredential.user;
 
     // Create db user
-    await addDoc(collection($db, "users"), {
-      id: user.uid,
+    await setDoc(doc($db, "users", user.uid), {
       email: user.email,
       created_at: new Date(),
+      first_name: firstName.value,
+      last_name: lastName.value,
     });
 
-    console.log("Utilisateur enregistré:", user);
-    router.push("/dashboard");
+    router.push("/");
   } catch (error: any) {
     errorMessage.value = error.message;
     console.error("Erreur lors de l'inscription:", error);
@@ -92,6 +93,39 @@ const toggleForm = () => {
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <div class="space-y-6">
+        <div v-if="isRegistering" class="flex justify-between gap-2">
+          <div class="w-1/2">
+            <label
+              for="firstName"
+              class="block text-sm font-medium leading-6 text-gray-900"
+            >
+              First name
+            </label>
+            <div class="mt-2">
+              <input
+                v-model="firstName"
+                required
+                class="block w-full rounded-md border-0 py-1.5 px-2 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+          <div class="w-1/2">
+            <label
+              for="lastName"
+              class="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Last name
+            </label>
+            <div class="mt-2">
+              <input
+                v-model="lastName"
+                required
+                class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+        </div>
+
         <div>
           <label
             for="email"
@@ -107,7 +141,7 @@ const toggleForm = () => {
               type="email"
               autocomplete="email"
               required
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
           </div>
         </div>
@@ -127,7 +161,7 @@ const toggleForm = () => {
               type="password"
               autocomplete="current-password"
               required
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
           </div>
         </div>
@@ -146,7 +180,7 @@ const toggleForm = () => {
               name="confirm-password"
               type="password"
               required
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
           </div>
         </div>

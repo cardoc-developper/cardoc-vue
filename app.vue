@@ -5,8 +5,6 @@ import { useNuxtApp } from "#app";
 const { $auth } = useNuxtApp();
 const router = useRouter();
 
-console.log("Auth:", $auth.currentUser);
-
 watch($auth.currentUser, (user: any) => {
   if (user) {
     router.push("/dashboard");
