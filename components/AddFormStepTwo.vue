@@ -62,7 +62,7 @@ const filterBrands = (input: string) => {
 
 const selectModel = (model: string) => {
   vehicle.value.model = model;
-  showModelDropdown.value = false; 
+  showModelDropdown.value = false;
 };
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -82,7 +82,7 @@ onBeforeUnmount(() => {
 });
 
 const preventCloseOnClick = (event: Event) => {
-  event.stopPropagation(); 
+  event.stopPropagation();
 };
 
 const onNextStep = () => {
@@ -108,21 +108,22 @@ const onPreviousStep = () => {
       @click.stop
     />
 
-    <!-- Dropdown for brand selection -->
-    <ul
-      v-if="showBrandDropdown && filteredBrands.length > 0"
-      class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
-      @click.stop="preventCloseOnClick"
-    >
-      <li
-        v-for="(brand, index) in filteredBrands"
-        :key="index"
-        @click="selectBrand(brand)"
-        class="p-2 cursor-pointer hover:bg-gray-100"
+    <transition name="dropdown">
+      <ul
+        v-if="showBrandDropdown && filteredBrands.length > 0"
+        class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
+        @click.stop="preventCloseOnClick"
       >
-        {{ brand }}
-      </li>
-    </ul>
+        <li
+          v-for="(brand, index) in filteredBrands"
+          :key="index"
+          @click="selectBrand(brand)"
+          class="p-2 cursor-pointer hover:bg-gray-100"
+        >
+          {{ brand }}
+        </li>
+      </ul>
+    </transition>
   </div>
 
   <div class="mb-6 grid grid-cols-3 gap-4">
@@ -149,20 +150,22 @@ const onPreviousStep = () => {
       @click.stop
     />
 
-    <ul
-      v-if="showModelDropdown && availableModels.length > 0"
-      class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
-      @click.stop="preventCloseOnClick"
-    >
-      <li
-        v-for="(model, index) in availableModels"
-        :key="index"
-        @click="selectModel(model)"
-        class="p-2 cursor-pointer hover:bg-gray-100"
+    <transition name="dropdown">
+      <ul
+        v-if="showModelDropdown && availableModels.length > 0"
+        class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
+        @click.stop="preventCloseOnClick"
       >
-        {{ model }}
-      </li>
-    </ul>
+        <li
+          v-for="(model, index) in availableModels"
+          :key="index"
+          @click="selectModel(model)"
+          class="p-2 cursor-pointer hover:bg-gray-100"
+        >
+          {{ model }}
+        </li>
+      </ul>
+    </transition>
   </div>
 
   <div class="flex justify-between gap-4">
@@ -198,6 +201,23 @@ li {
 
 li:hover {
   background-color: #f0f0f0;
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.dropdown-enter-to,
+.dropdown-leave-from {
+  max-height: 160px;
+  opacity: 1;
 }
 
 .dropdown-container {
