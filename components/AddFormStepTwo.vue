@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { defineEmits } from "vue";
 import carModels from "~/assets/utils/carModels.json";
 import bikeModels from "~/assets/utils/bikeModels.json";
@@ -22,6 +22,8 @@ const displayedBikeBrands = ref(allBikeBrands.value.slice(0, 9));
 const selectedBrand = ref("");
 const availableModels = ref<string[]>([]);
 const filteredBrands = ref<string[]>([]);
+const showBrandDropdown = ref(false);
+const showModelDropdown = ref(false);
 
 watch(
   () => vehicle.value.type,
@@ -31,6 +33,8 @@ watch(
     availableModels.value = [];
     selectedBrand.value = "";
     vehicle.value.model = "";
+    showBrandDropdown.value = false;
+    showModelDropdown.value = false;
   }
 );
 
@@ -41,6 +45,8 @@ const selectBrand = (brand: string) => {
   vehicle.value.brand = selectedBrand.value;
   vehicle.value.model = "";
   filteredBrands.value = [];
+  showBrandDropdown.value = false;
+  showModelDropdown.value = true;
 };
 
 const filterBrands = (input: string) => {
@@ -51,6 +57,32 @@ const filterBrands = (input: string) => {
         brand.toLowerCase().includes(input.toLowerCase())
       )
     : allBrands;
+  showBrandDropdown.value = true;
+};
+
+const selectModel = (model: string) => {
+  vehicle.value.model = model;
+  showModelDropdown.value = false; 
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (!target.closest(".dropdown-container")) {
+    showBrandDropdown.value = false;
+    showModelDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
+
+const preventCloseOnClick = (event: Event) => {
+  event.stopPropagation(); 
 };
 
 const onNextStep = () => {
@@ -63,22 +95,24 @@ const onPreviousStep = () => {
 </script>
 
 <template>
-  <div class="mb-6">
-    <label for="brand" class="block text-gray-700 mb-2"
-      >Marque du véhicule</label
-    >
+  <div class="relative mb-6">
+    <label for="brand" class="block text-gray-700 mb-2">Marque du véhicule</label>
     <input
       v-model="selectedBrand"
       @input="filterBrands(selectedBrand)"
+      @focus="showBrandDropdown = true"
       type="text"
       id="brand"
       class="w-full p-2 border border-gray-300 rounded-lg"
       placeholder="Taper une marque"
+      @click.stop
     />
 
+    <!-- Dropdown for brand selection -->
     <ul
-      v-if="filteredBrands.length > 0"
-      class="border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto"
+      v-if="showBrandDropdown && filteredBrands.length > 0"
+      class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
+      @click.stop="preventCloseOnClick"
     >
       <li
         v-for="(brand, index) in filteredBrands"
@@ -104,25 +138,26 @@ const onPreviousStep = () => {
     </button>
   </div>
 
-  <div v-if="availableModels.length > 0" class="mb-6">
-    <label for="model" class="block text-gray-700 mb-2"
-      >Modèle du véhicule</label
-    >
+  <div v-if="availableModels.length > 0" class="relative mb-6">
+    <label for="model" class="block text-gray-700 mb-2">Modèle du véhicule</label>
     <input
       v-model="vehicle.model"
+      @focus="showModelDropdown = true"
       type="text"
       placeholder="Taper un modèle"
       class="w-full p-2 border border-gray-300 rounded-lg"
+      @click.stop
     />
 
     <ul
-      v-if="availableModels.length > 0"
-      class="border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto"
+      v-if="showModelDropdown && availableModels.length > 0"
+      class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
+      @click.stop="preventCloseOnClick"
     >
       <li
         v-for="(model, index) in availableModels"
         :key="index"
-        @click="vehicle.model = model"
+        @click="selectModel(model)"
         class="p-2 cursor-pointer hover:bg-gray-100"
       >
         {{ model }}
@@ -145,3 +180,27 @@ const onPreviousStep = () => {
     </button>
   </div>
 </template>
+
+<style scoped>
+ul {
+  position: absolute;
+  z-index: 50;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  width: 100%;
+}
+
+li {
+  cursor: pointer;
+  padding: 8px;
+}
+
+li:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-container {
+  z-index: 50;
+}
+</style>
