@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { defineEmits } from 'vue';
-import type { Vehicle } from '../types/vehicle';
+import { ref } from "vue";
+import { defineEmits } from "vue";
+import type { VehicleToAdd } from "../types/vehicle";
 
-const vehicle = defineModel<Vehicle>('vehicle', { required: true });
+const vehicle = defineModel<VehicleToAdd>("vehicle", { required: true });
+const selectedFiles = defineModel<File[]>("files", { required: true });
 
-const emit = defineEmits(['previousStep']);
-
+const emit = defineEmits(["previousStep", "submit"]);
 
 const onPreviousStep = () => {
-  emit('previousStep');
+  emit("previousStep");
 };
 
-const selectedFiles = ref<File[]>([]);
 const previewImages = ref<string[]>([]);
 
 const handleFileChange = (event: Event) => {
@@ -20,8 +19,10 @@ const handleFileChange = (event: Event) => {
   if (input.files) {
     const newFiles = Array.from(input.files);
     selectedFiles.value.push(...newFiles);
-    previewImages.value.push(...newFiles.map(file => URL.createObjectURL(file)));
-    vehicle.value.images.push(...newFiles.map(file => file.name));
+    previewImages.value.push(
+      ...newFiles.map((file) => URL.createObjectURL(file))
+    );
+    vehicle.value.images.push(...newFiles.map((file) => file.name));
   }
 };
 
@@ -33,45 +34,54 @@ const removeImage = (index: number) => {
 </script>
 
 <template>
-    <div class="mb-6">
-      <label class="block text-gray-700 mb-2">Ajouter des photos du véhicule</label>
-      <input
-        type="file"
-        multiple
-        accept="image/*"
-        @change="handleFileChange"
-        class="w-full p-2 border border-gray-300 rounded-lg"
-      />
-  
-      <div v-if="previewImages.length" class="mt-4 grid grid-cols-2 gap-4">
-        <div v-for="(image, index) in previewImages" :key="index" class="relative">
-          <img :src="image" alt="Preview" class="w-full h-auto object-cover rounded-lg" />
-  
-          <button
-            @click="removeImage(index)"
-            class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full flex items-center justify-center"
-            style="width: 24px; height: 24px"
-            aria-label="Supprimer l'image"
-          >
-            ✕
-          </button>
-        </div>
+  <div class="mb-6">
+    <label class="block text-gray-700 mb-2"
+      >Ajouter des photos du véhicule</label
+    >
+    <input
+      type="file"
+      multiple
+      accept="image/*"
+      @change="handleFileChange"
+      class="w-full p-2 border border-gray-300 rounded-lg"
+    />
+
+    <div v-if="previewImages.length" class="mt-4 grid grid-cols-2 gap-4">
+      <div
+        v-for="(image, index) in previewImages"
+        :key="index"
+        class="relative"
+      >
+        <img
+          :src="image"
+          alt="Preview"
+          class="w-full h-auto object-cover rounded-lg"
+        />
+
+        <button
+          @click="removeImage(index)"
+          class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full flex items-center justify-center"
+          style="width: 24px; height: 24px"
+          aria-label="Supprimer l'image"
+        >
+          ✕
+        </button>
       </div>
     </div>
-  
-    <div class="flex justify-between gap-4">
-      <button
-        @click="onPreviousStep"
-        class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
-      >
-        Précédent
-      </button>
-      <button
-        @click="console.log(vehicle)"
-        class="w-full bg-vibrant-red text-white py-2 px-4 rounded-lg hover:bg-burnt-red"
-      >
-        Ajouter le véhicule
-      </button>
-    </div>
-  </template>
-  
+  </div>
+
+  <div class="flex justify-between gap-4">
+    <button
+      @click="onPreviousStep"
+      class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
+    >
+      Précédent
+    </button>
+    <button
+      @click="$emit('submit')"
+      class="w-full bg-vibrant-red text-white py-2 px-4 rounded-lg hover:bg-burnt-red"
+    >
+      Ajouter le véhicule
+    </button>
+  </div>
+</template>

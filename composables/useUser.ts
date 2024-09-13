@@ -1,7 +1,12 @@
 import { useNuxtApp } from "#app";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { state } from "./user";
+``;
+import type { User } from "~/types/user";
+
+const state = {
+  user: ref<User | null>(),
+};
 
 const initialized = computed(() => state.user.value != null);
 
@@ -20,7 +25,10 @@ export const useUser = () => {
       if (userSnapshot.exists()) {
         state.user.value = {
           id: userSnapshot.id,
-          ...userSnapshot.data(),
+          email: userSnapshot.data().email,
+          first_name: userSnapshot.data().first_name,
+          last_name: userSnapshot.data().last_name,
+          created_at: userSnapshot.data().created_at,
         };
       } else {
         console.error(

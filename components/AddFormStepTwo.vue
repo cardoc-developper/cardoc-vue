@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { defineEmits } from 'vue';
-import carModels from '~/assets/utils/carModels.json';
-import bikeModels from '~/assets/utils/bikeModels.json';
+import { ref, watch } from "vue";
+import { defineEmits } from "vue";
+import carModels from "~/assets/utils/carModels.json";
+import bikeModels from "~/assets/utils/bikeModels.json";
+import type { VehicleToAdd } from "~/types/vehicle";
 
 export type BrandModelMap = Record<string, string[]>;
 
-const emit = defineEmits(['nextStep', 'previousStep']);
-const vehicle = defineModel<any>('vehicle', { required: true });
+const emit = defineEmits(["nextStep", "previousStep"]);
+const vehicle = defineModel<VehicleToAdd>("vehicle", { required: true });
 
 const carBrandsData = carModels as BrandModelMap;
 const bikeBrandsData = bikeModels as BrandModelMap;
@@ -18,42 +19,54 @@ const allBikeBrands = ref(Object.keys(bikeBrandsData));
 const displayedCarBrands = ref(allCarBrands.value.slice(0, 9));
 const displayedBikeBrands = ref(allBikeBrands.value.slice(0, 9));
 
-const selectedBrand = ref('');
+const selectedBrand = ref("");
 const availableModels = ref<string[]>([]);
 const filteredBrands = ref<string[]>([]);
 
-watch(() => vehicle.value.type, (newType) => {
-  filteredBrands.value = newType === 'car' ? allCarBrands.value : allBikeBrands.value;
-  availableModels.value = [];
-  selectedBrand.value = '';
-  vehicle.value.model = ''; 
-});
+watch(
+  () => vehicle.value.type,
+  (newType) => {
+    filteredBrands.value =
+      newType === "car" ? allCarBrands.value : allBikeBrands.value;
+    availableModels.value = [];
+    selectedBrand.value = "";
+    vehicle.value.model = "";
+  }
+);
 
 const selectBrand = (brand: string) => {
   selectedBrand.value = brand;
-  availableModels.value = vehicle.value.type === 'car' ? carBrandsData[brand] : bikeBrandsData[brand];
+  availableModels.value =
+    vehicle.value.type === "car" ? carBrandsData[brand] : bikeBrandsData[brand];
   vehicle.value.brand = selectedBrand.value;
-  vehicle.value.model = ''; 
+  vehicle.value.model = "";
   filteredBrands.value = [];
 };
 
 const filterBrands = (input: string) => {
-  const allBrands = vehicle.value.type === 'car' ? allCarBrands.value : allBikeBrands.value;
-  filteredBrands.value = input ? allBrands.filter(brand => brand.toLowerCase().includes(input.toLowerCase())) : allBrands;
+  const allBrands =
+    vehicle.value.type === "car" ? allCarBrands.value : allBikeBrands.value;
+  filteredBrands.value = input
+    ? allBrands.filter((brand) =>
+        brand.toLowerCase().includes(input.toLowerCase())
+      )
+    : allBrands;
 };
 
 const onNextStep = () => {
-  emit('nextStep');
+  emit("nextStep");
 };
 
 const onPreviousStep = () => {
-  emit('previousStep');
+  emit("previousStep");
 };
 </script>
 
 <template>
   <div class="mb-6">
-    <label for="brand" class="block text-gray-700 mb-2">Marque du véhicule</label>
+    <label for="brand" class="block text-gray-700 mb-2"
+      >Marque du véhicule</label
+    >
     <input
       v-model="selectedBrand"
       @input="filterBrands(selectedBrand)"
@@ -63,7 +76,10 @@ const onPreviousStep = () => {
       placeholder="Taper une marque"
     />
 
-    <ul v-if="filteredBrands.length > 0" class="border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto">
+    <ul
+      v-if="filteredBrands.length > 0"
+      class="border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto"
+    >
       <li
         v-for="(brand, index) in filteredBrands"
         :key="index"
@@ -77,7 +93,9 @@ const onPreviousStep = () => {
 
   <div class="mb-6 grid grid-cols-3 gap-4">
     <button
-      v-for="(brand, index) in (vehicle.type === 'car' ? displayedCarBrands : displayedBikeBrands)"
+      v-for="(brand, index) in vehicle.type === 'car'
+        ? displayedCarBrands
+        : displayedBikeBrands"
       :key="index"
       @click="selectBrand(brand)"
       class="p-4 border border-gray-300 rounded-lg flex items-center justify-center"
@@ -87,15 +105,20 @@ const onPreviousStep = () => {
   </div>
 
   <div v-if="availableModels.length > 0" class="mb-6">
-    <label for="model" class="block text-gray-700 mb-2">Modèle du véhicule</label>
+    <label for="model" class="block text-gray-700 mb-2"
+      >Modèle du véhicule</label
+    >
     <input
       v-model="vehicle.model"
       type="text"
       placeholder="Taper un modèle"
       class="w-full p-2 border border-gray-300 rounded-lg"
     />
-    
-    <ul v-if="availableModels.length > 0" class="border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto">
+
+    <ul
+      v-if="availableModels.length > 0"
+      class="border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto"
+    >
       <li
         v-for="(model, index) in availableModels"
         :key="index"

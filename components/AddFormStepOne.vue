@@ -1,35 +1,39 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { defineEmits } from 'vue';
-import type { Vehicle } from '../types/vehicle';
+import { ref, computed } from "vue";
+import { defineEmits } from "vue";
+import type { VehicleToAdd } from "../types/vehicle";
 
-const vehicle = defineModel<Vehicle>('vehicle', { required: true });
-const emit = defineEmits(['nextStep']);
+const vehicle = defineModel<VehicleToAdd>("vehicle", { required: true });
+const emit = defineEmits(["nextStep"]);
 
 const formattedLicensePlate = computed({
   get() {
     return vehicle.value.licensePlate;
   },
   set(value: string) {
-    let formattedValue = value.replace(/[^A-Za-z0-9]/g, ''); 
+    let formattedValue = value.replace(/[^A-Za-z0-9]/g, "");
     if (formattedValue.length > 2) {
-      formattedValue = formattedValue.slice(0, 2) + '-' + formattedValue.slice(2);
+      formattedValue =
+        formattedValue.slice(0, 2) + "-" + formattedValue.slice(2);
     }
     if (formattedValue.length > 6) {
-      formattedValue = formattedValue.slice(0, 6) + '-' + formattedValue.slice(6);
+      formattedValue =
+        formattedValue.slice(0, 6) + "-" + formattedValue.slice(6);
     }
     vehicle.value.licensePlate = formattedValue;
   },
 });
 
 const nextStep = () => {
-  emit('nextStep');
+  emit("nextStep");
 };
 </script>
 
 <template>
   <div class="mb-6">
-    <label for="vehicle-name" class="block text-gray-700 mb-2">Nom du véhicule</label>
+    <label for="vehicle-name" class="block text-gray-700 mb-2"
+      >Nom du véhicule</label
+    >
     <input
       v-model="vehicle.vehicleName"
       type="text"
@@ -40,7 +44,9 @@ const nextStep = () => {
   </div>
 
   <div class="mb-6">
-    <label for="license-plate" class="block text-gray-700 mb-2">Plaque d'immatriculation</label>
+    <label for="license-plate" class="block text-gray-700 mb-2"
+      >Plaque d'immatriculation</label
+    >
     <input
       v-model="formattedLicensePlate"
       type="text"

@@ -1,12 +1,16 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig();
+
   const firebaseConfig = {
-    apiKey: "AIzaSyCE_EtgMUNbAxRjZ5hqHX6DYYez9qROU4A",
-    authDomain: "cardoc-981e6.firebaseapp.com",
-    projectId: "cardoc-981e6",
+    apiKey: config.public.FIREBASE_API_KEY,
+    authDomain: config.public.FIREBASE_AUTH_DOMAIN,
+    projectId: config.public.FIREBASE_PROJECT_ID,
+    storageBucket: config.public.FIREBASE_STORAGE_BUCKET,
   };
 
   let firebaseApp;
@@ -18,11 +22,13 @@ export default defineNuxtPlugin(() => {
 
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
+  const storage = getStorage(firebaseApp);
 
   return {
     provide: {
       auth,
       db,
+      storage,
     },
   };
 });
