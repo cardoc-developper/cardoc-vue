@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.border-gradient {
+  background: linear-gradient(to right, #18181b, #18181b),
+    linear-gradient(to bottom right, #c8acf0, #161618);
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+}

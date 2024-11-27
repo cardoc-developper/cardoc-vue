@@ -117,46 +117,44 @@ const createVehicle = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col justify-center items-center bg-white">
-    <div class="w-full max-w-md p-8 bg-white rounded-lg">
-      <h2 class="text-2xl font-bold text-center mb-6">Ajout de véhicule</h2>
-
-      <div v-if="currentStep === 1">
-        <AddFormStepOne v-model:vehicle="vehicle" @next-step="nextStep" />
+  <div class="min-h-screen bg-background flex items-center justify-center text-white p-6">
+    <!-- Container principal -->
+    <div class="flex flex-col md:flex-row items-center justify-between w-4/5 max-w-[1000px] relative ">
+      <!-- Section de bienvenue -->
+      <button v-if="currentStep > 1" @click="previousStep" class="underline underline-offset-2 absolute top-6 left-2">< Retour</button>
+      <div class="text-left w-full md:w-2/5 mb-6 md:mb-0">
+        
+        <h1 class="text-4xl font-semibold opacity-80">Bienvenue John !</h1>
+        <p class="mt-4 text-lg text-white">
+          Vous n'avez pas encore de véhicule enregistré.<br /><br />
+          Renseignez votre premier véhicule.
+        </p>
       </div>
 
-      <div v-if="currentStep === 2">
-        <AddFormStepTwo
-          v-model:vehicle="vehicle"
-          @next-step="nextStep"
-          @previous-step="previousStep"
-        />
-      </div>
+      <!-- Formulaire -->
+      <div class="px-8 py-10 border-gradient border-transparent border rounded-3xl w-full md:w-1/2">
+        <div v-if="currentStep === 1">
+          <AddFormStepOne v-model:vehicle="vehicle" @next-step="nextStep" />
+        </div>
 
-      <div v-if="currentStep === 3">
-        <AddFormStepThree
-          v-model:vehicle="vehicle"
-          @next-step="nextStep"
-          @previous-step="previousStep"
-        />
-      </div>
+        <div v-if="currentStep === 2">
+          <AddFormStepTwo v-model:vehicle="vehicle" @next-step="nextStep" />
+        </div>
 
-      <div v-if="currentStep === 4">
-        <AddFormStepFour
-          v-model:vehicle="vehicle"
-          @next-step="nextStep"
-          @previous-step="previousStep"
-        />
-      </div>
+        <div v-if="currentStep === 3">
+          <AddFormStepThree v-model:vehicle="vehicle" @next-step="nextStep" @previous-step="previousStep" />
+        </div>
 
-      <div v-if="currentStep === 5">
-        <AddFormStepFive
-          v-model:vehicle="vehicle"
-          v-model:files="files"
-          @previous-step="previousStep"
-          @submit="createVehicle"
-        />
+        <div v-if="currentStep === 4">
+          <AddFormStepFour v-model:vehicle="vehicle" @next-step="nextStep" @previous-step="previousStep" />
+        </div>
+
+        <div v-if="currentStep === 5">
+          <AddFormStepFive v-model:vehicle="vehicle" v-model:files="files" @previous-step="previousStep"
+            @submit="createVehicle" />
+        </div>
       </div>
     </div>
   </div>
+
 </template>

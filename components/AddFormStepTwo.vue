@@ -7,7 +7,7 @@ import type { VehicleToAdd } from "~/types/vehicle";
 
 export type BrandModelMap = Record<string, string[]>;
 
-const emit = defineEmits(["nextStep", "previousStep"]);
+const emit = defineEmits(["nextStep"]);
 const vehicle = defineModel<VehicleToAdd>("vehicle", { required: true });
 
 const carBrandsData = carModels as BrandModelMap;
@@ -16,51 +16,73 @@ const bikeBrandsData = bikeModels as BrandModelMap;
 const allCarBrands = ref(Object.keys(carBrandsData));
 const allBikeBrands = ref(Object.keys(bikeBrandsData));
 
-const displayedCarBrands = ref(allCarBrands.value.slice(0, 9));
-const displayedBikeBrands = ref(allBikeBrands.value.slice(0, 9));
-
+const displayedBrands = ref<string[]>([]);
 const selectedBrand = ref("");
 const availableModels = ref<string[]>([]);
-const filteredBrands = ref<string[]>([]);
-const showBrandDropdown = ref(false);
+const searchExpanded = ref(false);
+const brandQuery = ref("");
+const modelQuery = ref("");
 const showModelDropdown = ref(false);
+const filteredModels = ref<string[]>([]);
+
 
 watch(
   () => vehicle.value.type,
   (newType) => {
-    filteredBrands.value =
+    const allBrands =
       newType === "car" ? allCarBrands.value : allBikeBrands.value;
+    displayedBrands.value = allBrands.slice(0, 8);
     availableModels.value = [];
-    selectedBrand.value = "";
-    vehicle.value.model = "";
-    showBrandDropdown.value = false;
-    showModelDropdown.value = false;
-  }
+    brandQuery.value = "";
+    filteredModels.value = [];
+    selectedBrand.value = vehicle.value.brand;
+    modelQuery.value = vehicle.value.model;
+  },
+  { immediate: true }
 );
+
 
 const selectBrand = (brand: string) => {
   selectedBrand.value = brand;
   availableModels.value =
     vehicle.value.type === "car" ? carBrandsData[brand] : bikeBrandsData[brand];
   vehicle.value.brand = selectedBrand.value;
-  vehicle.value.model = "";
-  filteredBrands.value = [];
-  showBrandDropdown.value = false;
+  filteredModels.value = availableModels.value;
+
+  if (vehicle.value.model === "") {
+    modelQuery.value = ""
+    vehicle.value.model = ""
+  } else {
+    modelQuery.value = vehicle.value.model;
+    vehicle.value.model = vehicle.value.model;
+  }
+};
+
+const filterBrands = (query: string) => {
+  const allBrands =
+    vehicle.value.type === "car" ? allCarBrands.value : allBikeBrands.value;
+  displayedBrands.value = query
+    ? allBrands
+      .filter((brand) =>
+        brand.toLowerCase().includes(query.toLowerCase())
+      )
+      .slice(0, 8) // Limité à 8 résultats.
+    : allBrands.slice(0, 8);
+};
+
+const filterModels = (input: string) => {
+  const allModels = availableModels.value;
+  filteredModels.value = input
+    ? allModels.filter((model) =>
+      model.toLowerCase().includes(input.toLowerCase())
+    )
+    : allModels;
   showModelDropdown.value = true;
 };
 
-const filterBrands = (input: string) => {
-  const allBrands =
-    vehicle.value.type === "car" ? allCarBrands.value : allBikeBrands.value;
-  filteredBrands.value = input
-    ? allBrands.filter((brand) =>
-        brand.toLowerCase().includes(input.toLowerCase())
-      )
-    : allBrands;
-  showBrandDropdown.value = true;
-};
 
 const selectModel = (model: string) => {
+  modelQuery.value = model;
   vehicle.value.model = model;
   showModelDropdown.value = false;
 };
@@ -68,120 +90,91 @@ const selectModel = (model: string) => {
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
   if (!target.closest(".dropdown-container")) {
-    showBrandDropdown.value = false;
     showModelDropdown.value = false;
+  }
+  if (!target.closest(".search-container")) {
+    searchExpanded.value = false;
   }
 };
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  if (vehicle.value.brand !== "") {
+    selectBrand(vehicle.value.brand);
+  }
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
+
 });
 
 const preventCloseOnClick = (event: Event) => {
   event.stopPropagation();
 };
 
-const onNextStep = () => {
-  emit("nextStep");
-};
+const isFormValid = computed(() => {
+  return (
+    vehicle.value.brand.trim() !== "" &&
+    vehicle.value.model.trim() !== ""
+  );
+});
 
-const onPreviousStep = () => {
-  emit("previousStep");
+
+const onNextStep = () => {
+  console.log(vehicle.value);
+  emit("nextStep");
 };
 </script>
 
 <template>
   <div class="relative mb-6">
-    <label for="brand" class="block text-gray-700 mb-2">Marque du véhicule</label>
-    <input
-      v-model="selectedBrand"
-      @input="filterBrands(selectedBrand)"
-      @focus="showBrandDropdown = true"
-      type="text"
-      id="brand"
-      class="w-full p-2 border border-gray-300 rounded-lg"
-      placeholder="Taper une marque"
-      @click.stop
-    />
+    <label for="brand" class="block text-white py-1">Marque du véhicule</label>
+    <div @click="searchExpanded = true" :class="['search-container absolute flex items-center gap-2 rounded-full p-2 border-gradient border-transparent border cursor-pointer top-0 right-0 duration-300', searchExpanded ? 'w-full' : 'w-[34px]']">
+      <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <input v-if="searchExpanded" v-model="brandQuery" @input="filterBrands(brandQuery)" type="text" id="brand"
+      class="w-full h-full bg-transparent" placeholder="Taper une marque" @click.stop />
+    </div>
 
-    <transition name="dropdown">
-      <ul
-        v-if="showBrandDropdown && filteredBrands.length > 0"
-        class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
-        @click.stop="preventCloseOnClick"
-      >
-        <li
-          v-for="(brand, index) in filteredBrands"
-          :key="index"
-          @click="selectBrand(brand)"
-          class="p-2 cursor-pointer hover:bg-gray-100"
-        >
-          {{ brand }}
-        </li>
-      </ul>
-    </transition>
+    
   </div>
 
-  <div class="mb-6 grid grid-cols-3 gap-4">
-    <button
-      v-for="(brand, index) in vehicle.type === 'car'
-        ? displayedCarBrands
-        : displayedBikeBrands"
-      :key="index"
-      @click="selectBrand(brand)"
-      class="p-4 border border-gray-300 rounded-lg flex items-center justify-center"
-    >
+  <div class="mb-6 grid grid-cols-4 gap-6 justify-evenly justify-items-center items-center content-evenly min-h-[184px]">
+    <button v-for="(brand, index) in displayedBrands" :key="index" @click="selectBrand(brand)" :class="[
+      'w-20 h-20 p-4 border border-white rounded-lg flex items-center center justify-center duration-200 hover:bg-white hover:text-black',
+      selectedBrand === brand ? 'bg-white text-black' : 'bg-transparent text-white',
+    ]">
       {{ brand }}
     </button>
+    <p v-if="displayedBrands.length === 0" class="col-span-4 flex items-center justify-center text-white">Aucun Résultat</p>
   </div>
 
-  <div v-if="availableModels.length > 0" class="relative mb-6">
-    <label for="model" class="block text-gray-700 mb-2">Modèle du véhicule</label>
-    <input
-      v-model="vehicle.model"
-      @focus="showModelDropdown = true"
-      type="text"
-      placeholder="Taper un modèle"
-      class="w-full p-2 border border-gray-300 rounded-lg"
-      @click.stop
-    />
+  <div v-if="availableModels.length > 0 || vehicle.brand !== ''" class="relative mb-6">
+    <label for="model" class="block text-white mb-2">Modèle du véhicule</label>
+    <input v-model="modelQuery" @focus="showModelDropdown = true" @input="filterModels(modelQuery)" type="text"
+      placeholder="Taper un modèle" class="w-full p-2 border border-white rounded-lg bg-transparent" @click.stop />
 
     <transition name="dropdown">
-      <ul
-        v-if="showModelDropdown && availableModels.length > 0"
-        class="dropdown-container absolute border border-gray-300 rounded-lg bg-white mt-2 max-h-40 overflow-y-auto z-50 w-full"
-        @click.stop="preventCloseOnClick"
-      >
-        <li
-          v-for="(model, index) in availableModels"
-          :key="index"
-          @click="selectModel(model)"
-          class="p-2 cursor-pointer hover:bg-gray-100"
-        >
+      <ul v-if="showModelDropdown && filteredModels.length > 0"
+        class="dropdown-container absolute border border-white rounded-lg bg-transparent mt-2 max-h-40 overflow-y-auto z-50 w-full"
+        @click.stop="preventCloseOnClick">
+        <li v-for="(model, index) in filteredModels" :key="index" @click="selectModel(model)"
+          class="p-2 cursor-pointer hover:text-black hover:bg-gray-100 duration-100">
           {{ model }}
         </li>
       </ul>
     </transition>
+
   </div>
 
-  <div class="flex justify-between gap-4">
-    <button
-      @click="onPreviousStep"
-      class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
-    >
-      Précédent
-    </button>
-    <button
-      @click="onNextStep"
-      class="w-full bg-vibrant-red text-white py-2 px-4 rounded-lg hover:bg-burnt-red"
-    >
-      Suivant
-    </button>
-  </div>
+  <button @click="onNextStep" :disabled="!isFormValid" :class="['w-full p-4 rounded-lg font-medium duration-200',
+    isFormValid ? 'bg-white text-black hover:scale-105' : 'bg-gray-400 text-gray-700 cursor-not-allowed']">
+    Suivant
+  </button>
 </template>
 
 <style scoped>
@@ -190,7 +183,7 @@ ul {
   z-index: 50;
   top: 100%;
   left: 0;
-  background-color: white;
+  background: #121317;
   width: 100%;
 }
 
