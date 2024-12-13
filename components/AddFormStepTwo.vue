@@ -137,7 +137,7 @@ const onNextStep = () => {
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
       <input v-if="searchExpanded" v-model="brandQuery" @input="filterBrands(brandQuery)" type="text" id="brand"
-      class="w-full h-full bg-transparent" placeholder="Taper une marque" @click.stop />
+      class="h-4 w-full bg-transparent" placeholder="Taper une marque" @click.stop />
     </div>
 
     

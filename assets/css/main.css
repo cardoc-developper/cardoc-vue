@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
 .border-gradient {
   background: linear-gradient(to right, #18181b, #18181b),
     linear-gradient(to bottom right, #c8acf0, #161618);

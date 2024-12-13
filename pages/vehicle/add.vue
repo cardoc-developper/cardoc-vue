@@ -30,7 +30,7 @@ const vehicle = ref<VehicleToAdd>({
   energy: "",
   dateOfFirstRegistration: "",
   dateOfPurchase: "",
-  numberOfOwners: "",
+  numberOfOwners: parseInt("0"),
   images: [],
 });
 
@@ -40,6 +40,7 @@ const currentStep = ref(1);
 const totalSteps = ref(5);
 
 const nextStep = () => {
+  console.log(vehicle.value);
   if (currentStep.value < totalSteps.value) {
     currentStep.value++;
   }
@@ -121,7 +122,7 @@ const createVehicle = async () => {
     <!-- Container principal -->
     <div class="flex flex-col md:flex-row items-center justify-between w-4/5 max-w-[1000px] relative ">
       <!-- Section de bienvenue -->
-      <button v-if="currentStep > 1" @click="previousStep" class="underline underline-offset-2 absolute top-6 left-2">< Retour</button>
+      <button v-if="currentStep > 1" @click="previousStep" class="underline underline-offset-2 absolute -top-10 md:top-6 left-2">< Retour</button>
       <div class="text-left w-full md:w-2/5 mb-6 md:mb-0">
         
         <h1 class="text-4xl font-semibold opacity-80">Bienvenue John !</h1>
@@ -132,7 +133,7 @@ const createVehicle = async () => {
       </div>
 
       <!-- Formulaire -->
-      <div class="px-8 py-10 border-gradient border-transparent border rounded-3xl w-full md:w-1/2">
+      <div class="px-8 py-10 py border-gradient border-transparent border rounded-3xl w-full md:w-1/2">
         <div v-if="currentStep === 1">
           <AddFormStepOne v-model:vehicle="vehicle" @next-step="nextStep" />
         </div>
@@ -142,7 +143,7 @@ const createVehicle = async () => {
         </div>
 
         <div v-if="currentStep === 3">
-          <AddFormStepThree v-model:vehicle="vehicle" @next-step="nextStep" @previous-step="previousStep" />
+          <AddFormStepThree v-model:vehicle="vehicle" @next-step="nextStep"/>
         </div>
 
         <div v-if="currentStep === 4">

@@ -40,6 +40,23 @@ const isFormValid = computed(() => {
 const nextStep = () => {
   emit("nextStep");
 };
+
+watch(() => vehicle.value.type, (newType) => {
+  if (newType !== "") {
+    // Réinitialisation des champs en fonction du type de véhicule
+    if (newType === "car" || newType === "moto") {
+      vehicle.value.model = "";
+      vehicle.value.color = "";
+      vehicle.value.mileage = 0;
+      vehicle.value.numberOfOwners = 0;
+      vehicle.value.dateOfFirstRegistration = "";
+      vehicle.value.dateOfPurchase = "";
+      vehicle.value.images = [];
+      vehicle.value.brand = "";
+      vehicle.value.energy = "";
+    }
+  }
+});
 </script>
 
 <template>
