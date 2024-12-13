@@ -25,85 +25,55 @@ const colors = ref([
 ]);
 
 const energies = ref([
-  "Essence",
-  "Diesel",
-  "Hybride",
-  "Electrique",
-  "GPL",
-  "Autre",
+  { value: "Essence" },
+  { value: "Diesel" },
+  { value: "Hybride" },
+  { value: "Electrique" },
+  { value: "GPL" },
+  { value: "Autre" },
 ]);
+
+const handleColorSelection = (color: { value: string; hex: string }) => {
+  vehicle.color = color.value; // Met à jour la couleur dans le modèle
+};
+
+const handleEnergySelection = (energy: string) => {
+  vehicle.energy = energy;
+};
+
+const isFormValid = computed(() => {
+  return (
+    vehicle.value.color.trim() !== "" &&
+    vehicle.value.energy.trim() !== ""
+  );
+});
+
 </script>
 
 <template>
   <div class="mb-6">
-    <label class="block text-gray-700 mb-2">Couleur du véhicule</label>
-    <div class="flex space-x-2">
-      <button
-        v-for="(color, index) in colors"
-        :key="index"
-        :class="{ 'ring-2 ring-gray-700': vehicle.color === color.value }"
-        @click="vehicle.color = color.value"
-        :style="{ backgroundColor: color.hex }"
-        class="w-10 h-10 rounded-full border border-gray-300"
-      ></button>
+    <label class="block text-white mb-2">Couleur du véhicule</label>
+    <Dropdown v-model="vehicle.color" :options="colors" placeholder="Choisissez une couleur"
+      @color-selected="handleColorSelection" />
+  </div>
+
+  <div class="mb-6">
+    <label for="mileage" class="block text-white mb-2">Kilométrage</label>
+    <div class="relative">
+      <input v-model="vehicle.mileage" type="number" id="mileage"
+        class="w-full py-2 px-4 border border-gray-300 rounded-lg bg-transparent" placeholder="100000" />
+      <span class="absolute right-2 top-1/2 -translate-y-1/2 text-white">KM</span>
     </div>
   </div>
 
   <div class="mb-6">
-    <label for="mileage" class="block text-gray-700 mb-2"
-      >Kilométrage du véhicule</label
-    >
-    <input
-      v-model="vehicle.mileage"
-      type="number"
-      id="mileage"
-      class="w-full p-2 border border-gray-300 rounded-lg"
-      placeholder="100000"
-    />
+    <label class="block text-white mb-2">Type de carburant</label>
+    <Dropdown v-model="vehicle.energy" :options="energies" placeholder="Choisissez une énergie"
+      @option-selected="handleEnergySelection" />
   </div>
 
-  <div class="mb-6">
-    <label class="block text-gray-700 mb-2">Energie du véhicule</label>
-    <div class="grid grid-cols-3 gap-2">
-      <button
-        v-for="(energy, index) in energies"
-        :key="index"
-        :class="{ 'bg-gray-300': vehicle.energy === energy }"
-        @click="vehicle.energy = energy"
-        class="p-2 border border-gray-300 rounded-lg text-center"
-      >
-        {{ energy }}
-      </button>
-    </div>
-  </div>
-
-  <div class="mb-6">
-    <label class="block text-gray-700 mb-2"
-      >Nombre de propriétaire(s) du véhicule</label
-    >
-    <div class="grid gap-2">
-      <input
-        v-model="vehicle.numberOfOwners"
-        type="number"
-        id="owner"
-        class="w-full p-2 border border-gray-300 rounded-lg"
-        placeholder="1"
-      />
-    </div>
-  </div>
-
-  <div class="flex justify-between gap-4">
-    <button
-      @click="onPreviousStep"
-      class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
-    >
-      Précédent
-    </button>
-    <button
-      @click="onNextStep"
-      class="w-full bg-vibrant-red text-white py-2 px-4 rounded-lg hover:bg-burnt-red"
-    >
-      Suivant
-    </button>
-  </div>
+  <button @click="onNextStep" :disabled="!isFormValid" :class="['w-full p-4 rounded-lg font-medium duration-200',
+    isFormValid ? 'bg-white text-black hover:scale-105' : 'bg-gray-400 text-gray-700 cursor-not-allowed']">
+    Suivant
+  </button>
 </template>

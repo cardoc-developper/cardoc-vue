@@ -10,7 +10,7 @@ export type Vehicle = {
   energy: string;
   date_of_first_registration: string;
   date_of_purchase: string;
-  number_of_owners: string;
+  number_of_owners: number;
   images: string[];
 };
 
@@ -26,6 +26,6 @@ export type VehicleToAdd = {
   energy: string;
   dateOfFirstRegistration: string;
   dateOfPurchase: string;
-  numberOfOwners: string;
+  numberOfOwners: number;
   images: string[];
 };

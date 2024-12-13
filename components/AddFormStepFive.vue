@@ -35,7 +35,7 @@ const removeImage = (index: number) => {
 
 <template>
   <div class="mb-6">
-    <label class="block text-gray-700 mb-2"
+    <label class="block text-white mb-2"
       >Ajouter des photos du véhicule</label
     >
     <input
@@ -43,7 +43,7 @@ const removeImage = (index: number) => {
       multiple
       accept="image/*"
       @change="handleFileChange"
-      class="w-full p-2 border border-gray-300 rounded-lg"
+      class="w-full p-8 border border-gray-300 rounded-lg"
     />
 
     <div v-if="previewImages.length" class="mt-4 grid grid-cols-2 gap-4">
@@ -70,18 +70,10 @@ const removeImage = (index: number) => {
     </div>
   </div>
 
-  <div class="flex justify-between gap-4">
-    <button
-      @click="onPreviousStep"
-      class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
-    >
-      Précédent
-    </button>
     <button
       @click="$emit('submit')"
-      class="w-full bg-vibrant-red text-white py-2 px-4 rounded-lg hover:bg-burnt-red"
+      class="w-full p-4 rounded-lg font-medium duration-200 bg-white text-black hover:scale-105"
     >
       Ajouter le véhicule
     </button>
-  </div>
 </template>
