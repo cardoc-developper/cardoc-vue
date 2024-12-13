@@ -14,6 +14,9 @@ import {
   getDownloadURL,
 } from "firebase/storage"; // Importation des fonctions pour Storage
 
+import CarIcon from "@/assets/icons/car.vue";
+import BikeIcon from "@/assets/icons/bike.vue";
+
 const router = useRouter();
 const { $db, $storage } = useNuxtApp();
 const { user } = useUser();
@@ -118,18 +121,87 @@ const createVehicle = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background flex items-center justify-center text-white p-6">
+  <div class="min-h-screen bg-background flex items-center justify-center text-white px-6 py-10">
     <!-- Container principal -->
-    <div class="flex flex-col md:flex-row items-center justify-between w-4/5 max-w-[1000px] relative ">
+    <div class="flex flex-col md:flex-row items-center justify-between w-full md:w-4/5 max-w-[1000px] relative ">
       <!-- Section de bienvenue -->
-      <button v-if="currentStep > 1" @click="previousStep" class="underline underline-offset-2 absolute -top-10 md:top-6 left-2">< Retour</button>
-      <div class="text-left w-full md:w-2/5 mb-6 md:mb-0">
-        
-        <h1 class="text-4xl font-semibold opacity-80">Bienvenue John !</h1>
-        <p class="mt-4 text-lg text-white">
-          Vous n'avez pas encore de véhicule enregistré.<br /><br />
-          Renseignez votre premier véhicule.
-        </p>
+      <button v-if="currentStep > 1" @click="previousStep" class="underline underline-offset-2 absolute left-0 -top-6">
+        Retour
+      </button>
+      <div class="text-left w-full md:w-2/5 mb-6 md:mb-0 mt-4 md:mt-0">
+        <!-- Affichage dynamique en fonction de la step -->
+        <div v-if="currentStep === 1">
+          <h1 class="text-4xl font-semibold opacity-80">Bienvenue John !</h1>
+          <p class="mt-4 text-lg text-white">
+            Vous n'avez pas encore de véhicule enregistré.<br /><br />
+            Renseignez votre premier véhicule.
+          </p>
+        </div>
+        <div v-else>
+          <!-- Titre avec le nom du véhicule -->
+          <h1 class="text-4xl font-semibold opacity-80">
+            {{ vehicle.vehicleName || "Nom du véhicule" }}
+          </h1>
+
+          <!-- Petits rectangles avec les infos -->
+          <div class="mt-6 space-y-4">
+            <div v-if="currentStep >= 2" class="flex gap-2">
+              <p class="w-1/2 border border-white rounded-lg p-2 font-semibold">
+                {{ vehicle.licensePlate }}
+              </p>
+              <p
+                class="w-1/2 border border-white rounded-lg p-2 font-semibold flex items-center justify-between stroke-white">
+                {{ vehicle.type === "car" ? "Voiture" : "Moto" }}
+                <CarIcon v-if="vehicle.type === 'car'" />
+                <BikeIcon v-if="vehicle.type === 'moto'" />
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <div v-if="currentStep >= 3">
+                <div
+                  class="w-20 h-20 p-4 border border-white rounded-lg flex items-center center font-semibold justify-center">
+                  {{ vehicle.brand }}
+                </div>
+              </div>
+              <div v-if="currentStep >= 3" class="flex gap-2 flex-col justify-between h-20 w-full">
+                <p class="w-full border border-white rounded-lg px-2 py-1 font-semibold h-fit">
+                  {{ vehicle.model }}
+                </p>
+                <div class="flex gap-2">
+                  <div v-if="currentStep >= 4"
+                    class="w-1/2 border border-white rounded-lg px-2 py-1 font-semibold flex items-center h-fit">
+                    <div class="w-4 h-4 rounded-full mr-2 border border-white"
+                      :style="{ backgroundColor: vehicle.color }">
+                    </div>
+                    <p>
+                      {{ vehicle.color.charAt(0).toUpperCase() + vehicle.color.slice(1) }}
+                    </p>
+                  </div>
+                  <p v-if="currentStep >= 4" class="w-1/2 border border-white rounded-lg px-2 py-1 font-semibold h-fit">
+                    {{ vehicle.mileage }} KM
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="currentStep >= 4" class="flex gap-2">
+              <p v-if="currentStep >= 4" class="w-1/2 border border-white rounded-lg px-2 py-1 font-semibold h-fit">
+                {{ vehicle.energy }}
+              </p>
+              <p v-if="currentStep >= 5" class="w-1/2 border border-white rounded-lg px-2 py-1 font-semibold h-fit">
+                Propriétaires : {{ vehicle.numberOfOwners }}
+              </p>
+            </div>
+
+            <p v-if="currentStep >= 5" class="w-full border border-white rounded-lg px-2 py-1 font-semibold h-fit">
+              Enregistrement : {{ vehicle.dateOfFirstRegistration }}
+            </p>
+            <p v-if="currentStep >= 5" class="w-full border border-white rounded-lg px-2 py-1 font-semibold h-fit">
+              Achat : {{ vehicle.dateOfPurchase }}
+            </p>
+
+          </div>
+        </div>
       </div>
 
       <!-- Formulaire -->
@@ -143,16 +215,15 @@ const createVehicle = async () => {
         </div>
 
         <div v-if="currentStep === 3">
-          <AddFormStepThree v-model:vehicle="vehicle" @next-step="nextStep"/>
+          <AddFormStepThree v-model:vehicle="vehicle" @next-step="nextStep" />
         </div>
 
         <div v-if="currentStep === 4">
-          <AddFormStepFour v-model:vehicle="vehicle" @next-step="nextStep" @previous-step="previousStep" />
+          <AddFormStepFour v-model:vehicle="vehicle" @next-step="nextStep" />
         </div>
 
         <div v-if="currentStep === 5">
-          <AddFormStepFive v-model:vehicle="vehicle" v-model:files="files" @previous-step="previousStep"
-            @submit="createVehicle" />
+          <AddFormStepFive v-model:vehicle="vehicle" v-model:files="files" @submit="createVehicle" />
         </div>
       </div>
     </div>

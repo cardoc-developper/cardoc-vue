@@ -20,23 +20,42 @@ const onPreviousStep = () => {
 const registrationDate = ref<string>("");
 const purchaseDate = ref<string>("");
 
-// Fonction pour mettre à jour la date de première immatriculation dans le format YYYY-MM-DD
+const registrationDateError = ref<string>("");
+const purchaseDateError = ref<string>("");
+
+// Fonction pour valider une date
+const isValidDate = (date: string): boolean => {
+  const [day, month, year] = date.split("/").map(Number);
+  if (!day || !month || !year || year < 1900 || year > new Date().getFullYear()) {
+    return false;
+  }
+  const isValid = !isNaN(Date.parse(`${year}-${month}-${day}`));
+  return isValid && day <= 31 && month <= 12;
+};
+
+// Fonction pour mettre à jour la date de première immatriculation
 const updateRegistrationDate = () => {
-  const [day, month, year] = registrationDate.value.split("/");
-  if (day && month && year) {
+  if (isValidDate(registrationDate.value)) {
+    const [day, month, year] = registrationDate.value.split("/");
     vehicle.value.dateOfFirstRegistration = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    registrationDateError.value = "";
+  } else {
+    registrationDateError.value = "Date invalide. Utilisez le format DD/MM/YYYY.";
   }
 };
 
-// Fonction pour mettre à jour la date d'achat dans le format YYYY-MM-DD
+// Fonction pour mettre à jour la date d'achat
 const updatePurchaseDate = () => {
-  const [day, month, year] = purchaseDate.value.split("/");
-  if (day && month && year) {
+  if (isValidDate(purchaseDate.value)) {
+    const [day, month, year] = purchaseDate.value.split("/");
     vehicle.value.dateOfPurchase = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    purchaseDateError.value = "";
+  } else {
+    purchaseDateError.value = "Date invalide. Utilisez le format DD/MM/YYYY.";
   }
 };
 
-// Watchers pour formater les dates à chaque modification
+// Watchers pour formater et valider les dates à chaque modification
 watch(registrationDate, updateRegistrationDate);
 watch(purchaseDate, updatePurchaseDate);
 
@@ -64,12 +83,12 @@ onMounted(() => {
 
 const isFormValid = computed(() => {
   return (
+    isValidDate(registrationDate.value) &&
+    isValidDate(purchaseDate.value) &&
     vehicle.value.dateOfFirstRegistration.length === 10 &&
-    vehicle.value.dateOfPurchase.length === 10 &&
-    vehicle.value.numberOfOwners !== 0
+    vehicle.value.dateOfPurchase.length === 10
   );
 });
-
 </script>
 
 <template>
@@ -79,6 +98,7 @@ const isFormValid = computed(() => {
     <input v-model="registrationDate" @input="registrationDate = formatDate(registrationDate)" type="text"
       maxlength="10" placeholder="DD/MM/YYYY"
       class="w-full py-2 px-4 border border-gray-300 rounded-lg bg-transparent" />
+    <p v-if="registrationDateError" class="text-red-500 text-sm">{{ registrationDateError }}</p>
   </div>
 
   <!-- Date d'achat du véhicule -->
@@ -86,6 +106,7 @@ const isFormValid = computed(() => {
     <label class="block text-white mb-2">Date d'achat du véhicule</label>
     <input v-model="purchaseDate" @input="purchaseDate = formatDate(purchaseDate)" type="text" maxlength="10"
       placeholder="DD/MM/YYYY" class="w-full py-2 px-4 border border-gray-300 rounded-lg bg-transparent" />
+    <p v-if="purchaseDateError" class="text-red-500 text-sm">{{ purchaseDateError }}</p>
   </div>
 
   <div class="mb-6">

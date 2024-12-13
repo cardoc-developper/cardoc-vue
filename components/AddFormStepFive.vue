@@ -43,7 +43,7 @@ const removeImage = (index: number) => {
       multiple
       accept="image/*"
       @change="handleFileChange"
-      class="w-full p-2 border border-gray-300 rounded-lg"
+      class="w-full p-8 border border-gray-300 rounded-lg"
     />
 
     <div v-if="previewImages.length" class="mt-4 grid grid-cols-2 gap-4">

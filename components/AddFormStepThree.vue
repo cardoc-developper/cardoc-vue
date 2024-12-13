@@ -44,7 +44,6 @@ const handleEnergySelection = (energy: string) => {
 const isFormValid = computed(() => {
   return (
     vehicle.value.color.trim() !== "" &&
-    vehicle.value.mileage !== 0 &&
     vehicle.value.energy.trim() !== ""
   );
 });
