@@ -43,7 +43,6 @@ const currentStep = ref(1);
 const totalSteps = ref(5);
 
 const nextStep = () => {
-  console.log(vehicle.value);
   if (currentStep.value < totalSteps.value) {
     currentStep.value++;
   }
